@@ -16,12 +16,14 @@
 /readme.html
 /wp-*.php
 /xmlrpc.php
+/node_modules
 
 # Configuration
 wp-config.php
 
 # Example themes
 /wp-content/themes/twenty*/
+/wp-content/themes/fictional_university/node_modules
 
 # Example plugin
 /wp-content/plugins/hello.php
