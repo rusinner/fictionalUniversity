@@ -77,6 +77,12 @@ function university_adjust_queries($query)
     }
 }
 
+function universityMapKey($api)
+{
+    $api['key'] = 'apikey'; // here the real API key is needed 
+    return $api;
+}
+
 
 
 add_action('wp_enqueue_scripts', 'university_files');
@@ -84,3 +90,5 @@ add_action('wp_enqueue_scripts', 'university_files');
 add_action('after_setup_theme', 'university_features');
 
 add_action('pre_get_posts', 'university_adjust_queries');
+
+add_filter('acf/fields/google_map/api', 'universityMapKey');
