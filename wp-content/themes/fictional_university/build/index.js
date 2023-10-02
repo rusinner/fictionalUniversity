@@ -190,8 +190,13 @@ class Search {
     this.openButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".js-search-trigger");
     this.closeButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay__close");
     this.searchOverlay = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay");
+    this.searchField = jquery__WEBPACK_IMPORTED_MODULE_0___default()("#search-term");
+    this.resultsDiv = jquery__WEBPACK_IMPORTED_MODULE_0___default()("#search-overlay__results");
     this.events();
     this.isOverlayOpen = false;
+    this.isSpinnerVisible = false;
+    this.previousValue;
+    this.typingTimer;
   }
 
   //2.Events
@@ -199,9 +204,42 @@ class Search {
     this.openButton.on("click", this.openOverlay.bind(this));
     this.closeButton.on("click", this.closeOverlay.bind(this));
     jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).on("keydown", this.keyPressDispatcher.bind(this));
+    this.searchField.on("keyup", this.typingLogic.bind(this));
   }
 
   //3.Methods (function, action...)
+  typingLogic() {
+    if (this.searchField.val() !== this.previousValue) {
+      clearTimeout(this.typingTimer);
+      if (this.searchField.val()) {
+        if (!this.isSpinnerVisible) {
+          this.resultsDiv.html('<div class="spinner-loader"></div>');
+          this.isSpinnerVisible = true;
+        }
+        this.typingTimer = setTimeout(this.getResults.bind(this), 2000);
+      } else {
+        this.resultsDiv.html("");
+        this.isSpinnerVisible = false;
+      }
+    }
+    this.previousValue = this.searchField.val();
+  }
+  getResults() {
+    this.resultsDiv.html("Imagine real seach results here");
+    this.isSpinnerVisible = false;
+  }
+  keyPressDispatcher(e) {
+    //the third condition inn this if statement is not about this input field but in case
+    // we have another one or a text area,prevent s key from opening overlay
+    if (e.keyCode === 83 && !this.isOverlayOpen && !jquery__WEBPACK_IMPORTED_MODULE_0___default()("input, textarea").is(":focus")) {
+      this.openOverlay();
+      console.log("our open method just ran");
+    }
+    if (e.keyCode === 27 && this.isOverlayOpen) {
+      this.closeOverlay();
+      console.log("our close method just ran");
+    }
+  }
   openOverlay() {
     this.searchOverlay.addClass("search-overlay--active");
     jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").addClass("body-no-scroll");
@@ -211,16 +249,6 @@ class Search {
     this.searchOverlay.removeClass("search-overlay--active");
     jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").removeClass("body-no-scroll");
     this.isOverlayOpen = false;
-  }
-  keyPressDispatcher(e) {
-    if (e.keyCode === 83 && !this.isOverlayOpen) {
-      this.openOverlay();
-      console.log("our open method just ran");
-    }
-    if (e.keyCode === 27 && this.isOverlayOpen) {
-      this.closeOverlay();
-      console.log("our close method just ran");
-    }
   }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Search);
