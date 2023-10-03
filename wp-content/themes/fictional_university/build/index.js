@@ -224,9 +224,19 @@ class Search {
     }
     this.previousValue = this.searchField.val();
   }
+
+  //at the end of the arrow function there is no need to bind(this) as i would do at a standard function
+  //becuase then this keyword would be refered at getJSON method.Now it is being refered at the main object.
   getResults() {
-    this.resultsDiv.html("Imagine real seach results here");
-    this.isSpinnerVisible = false;
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON("http://localhost:10004/wp-json/wp/v2/posts?search=" + this.searchField.val(), posts => {
+      this.resultsDiv.html(`
+        <h2 class="search-overlay__section-title">Genaral Information</h2>
+        <ul class="link-list min-list">
+        ${posts.map(item => ` <li><a href="${item.link}"> ${item.title.rendered}</a></li>`).join("")}
+       
+        </ul>
+        `);
+    });
   }
   keyPressDispatcher(e) {
     //the third condition inn this if statement is not about this input field but in case
