@@ -228,14 +228,16 @@ class Search {
   //at the end of the arrow function there is no need to bind(this) as i would do at a standard function
   //becuase then this keyword would be refered at getJSON method.Now it is being refered at the main object.
   getResults() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON("http://localhost:10004/wp-json/wp/v2/posts?search=" + this.searchField.val(), posts => {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/posts?search=" + this.searchField.val(), posts => {
       this.resultsDiv.html(`
-        <h2 class="search-overlay__section-title">Genaral Information</h2>
-        <ul class="link-list min-list">
+        <h2 class="search-overlay__section-title">General Information</h2>
+        ${posts.length ? '<ul class="link-list min-list">' : " <p>No General Information matches this search</p>"}
+        
         ${posts.map(item => ` <li><a href="${item.link}"> ${item.title.rendered}</a></li>`).join("")}
        
-        </ul>
+       ${posts.length ? " </ul>" : ""}
         `);
+      this.isSpinnerVisible = false;
     });
   }
   keyPressDispatcher(e) {
