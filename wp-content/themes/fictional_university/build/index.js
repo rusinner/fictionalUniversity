@@ -187,6 +187,7 @@ __webpack_require__.r(__webpack_exports__);
 class Search {
   //1. describe and create or initiate our object
   constructor() {
+    this.addSearchHTML();
     this.openButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".js-search-trigger");
     this.closeButton = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay__close");
     this.searchOverlay = jquery__WEBPACK_IMPORTED_MODULE_0___default()(".search-overlay");
@@ -216,7 +217,7 @@ class Search {
           this.resultsDiv.html('<div class="spinner-loader"></div>');
           this.isSpinnerVisible = true;
         }
-        this.typingTimer = setTimeout(this.getResults.bind(this), 2000);
+        this.typingTimer = setTimeout(this.getResults.bind(this), 500);
       } else {
         this.resultsDiv.html("");
         this.isSpinnerVisible = false;
@@ -228,16 +229,21 @@ class Search {
   //at the end of the arrow function there is no need to bind(this) as i would do at a standard function
   //becuase then this keyword would be refered at getJSON method.Now it is being refered at the main object.
   getResults() {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/posts?search=" + this.searchField.val(), posts => {
+    //run two times getJSON beacuase i want to spread search to all kind of posts and pages
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().when(jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/posts?search=" + this.searchField.val()), jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/pages?search=" + this.searchField.val())).then((posts, pages) => {
+      //It is posts[0] and pages[0] because when the promise is being resolved the when then method also returns info about the request
+      var combinedResults = posts[0].concat(pages[0]);
       this.resultsDiv.html(`
         <h2 class="search-overlay__section-title">General Information</h2>
-        ${posts.length ? '<ul class="link-list min-list">' : " <p>No General Information matches this search</p>"}
+        ${combinedResults.length ? '<ul class="link-list min-list">' : " <p>No General Information matches this search</p>"}
         
-        ${posts.map(item => ` <li><a href="${item.link}"> ${item.title.rendered}</a></li>`).join("")}
+        ${combinedResults.map(item => ` <li><a href="${item.link}"> ${item.title.rendered}</a></li>`).join("")}
        
-       ${posts.length ? " </ul>" : ""}
+       ${combinedResults.length ? " </ul>" : ""}
         `);
       this.isSpinnerVisible = false;
+    }, () => {
+      this.resultsDiv.html("<p>Unexpected error please try again!</p>");
     });
   }
   keyPressDispatcher(e) {
@@ -255,12 +261,33 @@ class Search {
   openOverlay() {
     this.searchOverlay.addClass("search-overlay--active");
     jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").addClass("body-no-scroll");
+    this.searchField.val("");
+    //301 ms because this is how it takes to open overlay and i want to trigger focus after that
+    setTimeout(() => this.searchField.trigger("focus"), 301);
     this.isOverlayOpen = true;
   }
   closeOverlay() {
     this.searchOverlay.removeClass("search-overlay--active");
     jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").removeClass("body-no-scroll");
     this.isOverlayOpen = false;
+  }
+  addSearchHTML() {
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()("body").append(`
+    <div class="search-overlay">
+    <div class="search-overlay__top">
+        <div class="container">
+            <i class="fa fa-search search-overlay__icon" aria-hidden="true"></i>
+            <input type="text" class="search-term" placeholder="What are you looking for?" id="search-term" autocomplete="off">
+            <i class="fa fa-window-close search-overlay__close" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="container">
+        <div id="search-overlay__results">
+
+        </div>
+    </div>
+</div>
+    `);
   }
 }
 /* harmony default export */ __webpack_exports__["default"] = (Search);
