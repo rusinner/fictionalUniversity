@@ -1,5 +1,21 @@
 <?php
 
+
+//customize json rest api data
+function university_custom_rest()
+{
+    register_rest_field('post', 'authorName', array(
+        'get_callback' => function () {
+            return get_the_author();
+        }
+    ));
+};
+
+// add action to cusomize json api data
+add_action('rest_api_init', 'university_custom_rest');
+
+
+//make data dynamic in page.give option to user to change title etc.
 function pageBanner($args = NULL)
 {
     if (!isset($args['title'])) {
@@ -27,6 +43,8 @@ function pageBanner($args = NULL)
     </div>
 <?php }
 
+
+//import scripts,fonts,styles 
 function university_files()
 {
 
@@ -39,12 +57,16 @@ function university_files()
     wp_enqueue_style('our-main-styles-vendor', get_theme_file_uri('/build/index.css'));
     wp_enqueue_style('our-main-styles', get_theme_file_uri('/build/style-index.css'));
 
+
+    //make root url available in case you change server or provider so it won't be static
     wp_localize_script('main-university-js', 'universityData', array(
         'root_url' => get_site_url(),
         'nonce' => wp_create_nonce('wp_rest')
     ));
 }
 
+
+//customize features for the theme
 function university_features()
 {
 
@@ -55,6 +77,8 @@ function university_features()
     add_image_size('pageBanner', 1500, 350, true);
 }
 
+
+//adjust returning data from queries
 function university_adjust_queries($query)
 {
 
@@ -82,13 +106,14 @@ function university_adjust_queries($query)
     }
 }
 
+//google maps API 
 function universityMapKey($api)
 {
     $api['key'] = 'apikey'; // here the real API key is needed 
     return $api;
 }
 
-
+//hook the above functions to the corresponding functionality
 
 add_action('wp_enqueue_scripts', 'university_files');
 
