@@ -229,23 +229,94 @@ class Search {
   //at the end of the arrow function there is no need to bind(this) as i would do at a standard function
   //becuase then this keyword would be refered at getJSON method.Now it is being refered at the main object.
   getResults() {
-    //run two times getJSON beacuase i want to spread search to all kind of posts and pages
-    jquery__WEBPACK_IMPORTED_MODULE_0___default().when(jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/posts?search=" + this.searchField.val()), jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/wp/v2/pages?search=" + this.searchField.val())).then((posts, pages) => {
-      //It is posts[0] and pages[0] because when the promise is being resolved the when then method also returns info about the request
-      var combinedResults = posts[0].concat(pages[0]);
+    //we don't use asynchronous when then method because we make one request
+    jquery__WEBPACK_IMPORTED_MODULE_0___default().getJSON(universityData.root_url + "/wp-json/university/v1/search?term=" + this.searchField.val(), results => {
       this.resultsDiv.html(`
+      <div class="row">
+
+        <div class="one-third">
         <h2 class="search-overlay__section-title">General Information</h2>
-        ${combinedResults.length ? '<ul class="link-list min-list">' : " <p>No General Information matches this search</p>"}
+        ${results.generalInfo.length ? '<ul class="link-list min-list">' : " <p>No General Information matches this search</p>"}
         
-        ${combinedResults.map(item => ` <li><a href="${item.link}"> ${item.title.rendered}</a> ${item.type === "post" ? `by ${item.authorName}` : ""} </li>`).join("")}
+        ${results.generalInfo.map(item => ` <li><a href="${item.permalink}"> ${item.title}</a> ${item.postType === "post" ? `by ${item.authorName}` : ""} </li>`).join("")}
        
-       ${combinedResults.length ? " </ul>" : ""}
-        `);
+       ${results.generalInfo.length ? " </ul>" : ""}
+        </div>
+
+        <div class="one-third">
+        <h2 class="search-overlay__section-title">Programs</h2>
+        ${results.programs.length ? '<ul class="link-list min-list">' : ` <p>No programs match this search.<a href="${universityData.root_url}/programs">View all programs</a> </p>`}
+        
+        ${results.programs.map(item => ` <li><a href="${item.permalink}"> ${item.title}</a>
+              </li>`).join("")}
+       
+       ${results.programs.length ? " </ul>" : ""}
+        
+        <h2 class="search-overlay__section-title">Professors</h2>
+
+        </div>
+
+        <div class="one-third">
+        <h2 class="search-overlay__section-title">Campuses</h2>
+        ${results.campuses.length ? '<ul class="link-list min-list">' : ` <p>No campuses match this search. <a href="${universityData.root_url}/campuses">View all campuses</a></p>`}
+        
+        ${results.campuses.map(item => ` <li><a href="${item.permalink}"> ${item.title}</a>
+              </li>`).join("")}
+       
+       ${results.campuses.length ? " </ul>" : ""}
+
+        <h2 class="search-overlay__section-title">Events</h2>
+
+        </div>
+      </div>
+      `);
       this.isSpinnerVisible = false;
-    }, () => {
-      this.resultsDiv.html("<p>Unexpected error please try again!</p>");
     });
+
+    //this piece of code in the getResults fuction is been replaced because we made our custom API route
+    //run two times getJSON beacuase i want to spread search to all kind of posts and pages
+    // $.when(
+    //   $.getJSON(
+    //     universityData.root_url +
+    //       "/wp-json/wp/v2/posts?search=" +
+    //       this.searchField.val()
+    //   ),
+    //   $.getJSON(
+    //     universityData.root_url +
+    //       "/wp-json/wp/v2/pages?search=" +
+    //       this.searchField.val()
+    //   )
+    // ).then(
+    //   (posts, pages) => {
+    //     //It is posts[0] and pages[0] because when the promise is being resolved the when then method also returns info about the request
+    //     var combinedResults = posts[0].concat(pages[0]);
+    //     this.resultsDiv.html(`
+    //     <h2 class="search-overlay__section-title">General Information</h2>
+    //     ${
+    //       combinedResults.length
+    //         ? '<ul class="link-list min-list">'
+    //         : " <p>No General Information matches this search</p>"
+    //     }
+
+    //     ${combinedResults
+    //       .map(
+    //         (item) =>
+    //           ` <li><a href="${item.link}"> ${item.title.rendered}</a> ${
+    //             item.type === "post" ? `by ${item.authorName}` : ""
+    //           } </li>`
+    //       )
+    //       .join("")}
+
+    //    ${combinedResults.length ? " </ul>" : ""}
+    //     `);
+    //     this.isSpinnerVisible = false;
+    //   },
+    //   () => {
+    //     this.resultsDiv.html("<p>Unexpected error please try again!</p>");
+    //   }
+    // );
   }
+
   keyPressDispatcher(e) {
     //the third condition inn this if statement is not about this input field but in case
     // we have another one or a text area,prevent s key from opening overlay
