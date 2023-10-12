@@ -360,6 +360,8 @@ class Search {
     //301 ms because this is how it takes to open overlay and i want to trigger focus after that
     setTimeout(() => this.searchField.trigger("focus"), 301);
     this.isOverlayOpen = true;
+    //prevent default behavior of a tags and links not to redirect into search page and just open overlay
+    return false;
   }
   closeOverlay() {
     this.searchOverlay.removeClass("search-overlay--active");
