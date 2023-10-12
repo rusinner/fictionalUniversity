@@ -23,7 +23,9 @@ function university_post_types()
     //program post type
     register_post_type('program', array(
         'show_in_rest' => true,
-        'supports' => array('title', 'editor'),
+        //removed editor next to title below in the supports array beacause i don't want in the programs dashboard exist two block of text
+        //i added one custom so i do not need the default one
+        'supports' => array('title'),
         'rewrite' => array('slug' => 'programs'),
         'has_archive' => true,
         'public' => true,
