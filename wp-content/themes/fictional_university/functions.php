@@ -174,3 +174,14 @@ function ourLoginTitle()
 {
     return get_bloginfo('name');
 }
+
+//force note posts to be private despite the js code post status.It is an extra security mesure
+add_filter('wp_insert_post_data', 'makeNotePrivate');
+
+function makeNotePrivate($data)
+{
+    if ($data['post_type'] == 'note' and $data['post_status'] != 'trash') {
+        $data['post_status'] = 'private';
+    }
+    return $data;
+}
