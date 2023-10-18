@@ -12,6 +12,12 @@ function university_custom_rest()
             return get_the_author();
         }
     ));
+
+    register_rest_field('note', 'userNoteCount', array(
+        'get_callback' => function () {
+            return count_user_posts(get_current_user_id(), 'note');
+        }
+    ));
 };
 
 // add action to cusomize json api data
@@ -176,10 +182,20 @@ function ourLoginTitle()
 }
 
 //force note posts to be private despite the js code post status.It is an extra security mesure
-add_filter('wp_insert_post_data', 'makeNotePrivate');
+//using snitize does not allow subscribers to post html. 10 is priority number for the makeNote Private function if there are many filters and 2 is
+// thta this function works having 2 arguments
+add_filter('wp_insert_post_data', 'makeNotePrivate', 10, 2);
 
-function makeNotePrivate($data)
+function makeNotePrivate($data, $postarr)
 {
+    // the check if ID exists is because when i have 5 posts already wordpress couldn't let me delete or edit
+    if ($data['post_type'] == 'note') {
+        if (count_user_posts(get_current_user_id(), 'note') > 4 and !$postarr["ID"]) {
+            die('You have reached your note limit');
+        }
+        $data['post_content'] = sanitize_textarea_field($data['post_content']);
+        $data['post_title'] = sanitize_text_field($data['post_title']);
+    }
     if ($data['post_type'] == 'note' and $data['post_status'] != 'trash') {
         $data['post_status'] = 'private';
     }
