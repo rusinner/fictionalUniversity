@@ -99,6 +99,22 @@ function university_post_types()
         ),
         'menu_icon' => 'dashicons-welcome-write-blog'
     ));
+
+    // likes post type
+    register_post_type('like', array(
+        'supports' => array('title'),
+        'has_archive' => true,
+        'show_ui' => true,
+        'public' => false,
+        'labels' => array(
+            'name' => 'Likes',
+            'add_new_item' => 'Add New Like',
+            'edit_item' => 'Edit Like',
+            'all_items' => 'All Like',
+            'singular_name' => "Like"
+        ),
+        'menu_icon' => 'dashicons-heart'
+    ));
 }
 
 add_action('init', 'university_post_types');

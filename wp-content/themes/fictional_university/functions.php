@@ -1,8 +1,9 @@
 <?php
 
 //import seech-route file because it contains custom url route logic that could be written here but for maintainability reasons 
-// i created different file
+// i have created different files
 require get_theme_file_path('/inc/search-route.php');
+require get_theme_file_path('/inc/like-route.php');
 
 //customize json rest api data
 function university_custom_rest()
