@@ -202,3 +202,15 @@ function makeNotePrivate($data, $postarr)
     }
     return $data;
 }
+
+
+//this code below needed if use all-in-one WP migration plugin to exclude files from bundling
+
+
+// add_filter('ai1wm_exclude_content_from_export', 'ignoreCertainFiles');
+
+// function ignoreCertainFiles($exclude_filters)
+// {
+//     $exclude_filters[] = 'themes/fictional_university/node_modules';
+//     return $exclude_filters;
+// }
