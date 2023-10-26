@@ -5,6 +5,8 @@
 // Version:1.0 
 // Author: rusinner 
 // Author URI: https://github.com/rusinner
+// Text Domain: wcpdomain
+// Domain Path: /languages
 
 
 class WordCountAndTimePlugin
@@ -15,7 +17,16 @@ class WordCountAndTimePlugin
         add_action('admin_menu', array($this, 'adminPage'));
         add_action('admin_init', array($this, 'settings'));
         add_filter('the_content', array($this, 'ifWrap'));
+        add_action('init', array($this, 'languages'));
     }
+
+    //loads the existing languages.middle argument deprecatd so false
+    function languages()
+    {
+        load_plugin_textdomain('wcpdomain', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
+
     // function that checks if it is a blog post and if the plugin checkboxes are checked and calls the fucntion that returns the content with the counters
     function ifWrap($content)
     {
@@ -39,9 +50,9 @@ class WordCountAndTimePlugin
         if (get_option('wcp_wordcount', '1') or get_option('wcp_readtime', '1')) {
             $wordCount = str_word_count(strip_tags($content));
         }
-
+        //__() function is for translate purposes
         if (get_option('wcp_wordcount', '1')) {
-            $html .= 'This post has ' . $wordCount . ' words.<br>';
+            $html .= esc_html__('This post has', 'wcpdomain') . ' ' . $wordCount . ' ' . __('words', 'wcpdomain') . '<br>';
         }
         if (get_option('wcp_charactercount', '1')) {
             $html .= 'This post has ' . strlen(strip_tags($content)) . ' characters.<br>';
@@ -117,7 +128,7 @@ class WordCountAndTimePlugin
     // arguments are:Page Title name,Menu name,permissions(now is only for admin),slug (must be unique),function that generates the html
     function adminPage()
     {
-        add_options_page('Word Count Settings', 'Word Count', 'manage_options', 'word-count-settings-page', array($this, 'ourHTML'));
+        add_options_page('Word Count Settings', __('Word Count', 'wcpdomain'), 'manage_options', 'word-count-settings-page', array($this, 'ourHTML'));
     }
 
     function ourHTML()
