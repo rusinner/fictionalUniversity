@@ -52,7 +52,7 @@ class WordCountAndTimePlugin
         }
         //__() function is for translate purposes
         if (get_option('wcp_wordcount', '1')) {
-            $html .= esc_html__('This post has', 'wcpdomain') . ' ' . $wordCount . ' ' . __('words', 'wcpdomain') . '<br>';
+            $html .= esc_html__('This post has', 'wcpdomain') . ' ' . $wordCount . ' ' . esc_html__('words', 'wcpdomain') . '<br>';
         }
         if (get_option('wcp_charactercount', '1')) {
             $html .= 'This post has ' . strlen(strip_tags($content)) . ' characters.<br>';
