@@ -8,6 +8,7 @@ import {
   Icon,
 } from "@wordpress/components";
 
+//disable update button if is not everything checked on block
 (function () {
   let locked = false;
 
@@ -34,6 +35,7 @@ import {
   });
 })();
 
+//define block
 wp.blocks.registerBlockType("ourplugin/are-you-paying-attention", {
   title: "Are You Paying Attention?",
   icon: "smiley",
