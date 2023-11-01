@@ -30,7 +30,7 @@ class AreYouPayingAttention
     function theHTML($attributes)
     {
         if (!is_admin()) {
-            wp_enqueue_script('attentionFrontend', plugin_dir_url(__FILE__) . 'build/frontend.js', array('wp-element'));
+            wp_enqueue_script('attentionFrontend', plugin_dir_url(__FILE__) . 'build/frontend.js', array('wp-element'), 1.0, true);
             wp_enqueue_style('attntionFrontendStyles', plugin_dir_url(__FILE__) . 'build/frontend.css');
         }
 
