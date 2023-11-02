@@ -2,6 +2,8 @@ import "./index.scss";
 import { useSelect } from "@wordpress/data";
 import { useState, useEffect } from "react";
 import apiFetch from "@wordpress/api-fetch";
+//logo translate
+const __ = wp.i18n.__;
 
 wp.blocks.registerBlockType("ourplugin/featured-professor", {
   title: "Professor Callout",
@@ -72,7 +74,10 @@ function EditComponent(props) {
         <select
           onChange={(e) => props.setAttributes({ profId: e.target.value })}
         >
-          <option value="">Select a professor</option>
+          <option value="">
+            {/* __ is for translation plugin */}
+            {__("Select a professor", "featured-professor")}
+          </option>
           {allProfs.map((prof) => {
             return (
               <option
