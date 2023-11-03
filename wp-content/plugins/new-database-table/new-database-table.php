@@ -3,13 +3,15 @@
 /*
   Plugin Name: Pet Adoption (New DB Table)
   Version: 1.0
-  Author: Rusinner
+  Author: Brad
   Author URI: https://www.udemy.com/user/bradschiff/
 */
 
 if (!defined('ABSPATH')) exit; // Exit if accessed directly
 require_once plugin_dir_path(__FILE__) . 'inc/generatePet.php';
 
+
+define('NEWDATABASETABLEPATH', plugin_dir_path(__FILE__));
 class PetAdoptionTablePlugin
 {
   function __construct()
@@ -19,14 +21,43 @@ class PetAdoptionTablePlugin
     $this->tablename = $wpdb->prefix . "pets";
 
     add_action('activate_new-database-table/new-database-table.php', array($this, 'onActivate'));
-    // add_action('admin_head', array($this, 'populateFast'));
+    //add_action('admin_head', array($this, 'populateFast'));
+    add_action('admin_post_createpet', array($this, 'createPet'));
+    add_action('admin_post_nopriv_createpet', array($this, 'createPet'));
+    add_action('admin_post_deletepet', array($this, 'deletePet'));
+    add_action('admin_post_nopriv_deletepet', array($this, 'deletePet'));
     add_action('wp_enqueue_scripts', array($this, 'loadAssets'));
-    add_filter('template_include', array($this, 'loadTemplate'), 99);
+  }
+
+  function deletePet()
+  {
+    if (current_user_can('administrator')) {
+      $id = sanitize_text_field($_POST['idtodelete']);
+      global $wpdb;
+      $wpdb->delete($this->tablename, array('id' => $id));
+      wp_safe_redirect(site_url('/pet-adoption'));
+    } else {
+      wp_safe_redirect(site_url());
+    }
+    exit;
+  }
+
+  function createPet()
+  {
+    if (current_user_can('administrator')) {
+      $pet = generatePet();
+      $pet['petname'] = sanitize_text_field($_POST['incomingpetname']);
+      global $wpdb;
+      $wpdb->insert($this->tablename, $pet);
+      wp_safe_redirect(site_url('/pet-adoption'));
+    } else {
+      wp_safe_redirect(site_url());
+    }
+    exit;
   }
 
   function onActivate()
   {
-    //create custom table
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta("CREATE TABLE $this->tablename (
       id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -65,7 +96,7 @@ class PetAdoptionTablePlugin
   function populateFast()
   {
     $query = "INSERT INTO $this->tablename (`species`, `birthyear`, `petweight`, `favfood`, `favhobby`, `favcolor`, `petname`) VALUES ";
-    $numberofpets = 1000;
+    $numberofpets = 100000;
     for ($i = 0; $i < $numberofpets; $i++) {
       $pet = generatePet();
       $query .= "('{$pet['species']}', {$pet['birthyear']}, {$pet['petweight']}, '{$pet['favfood']}', '{$pet['favhobby']}', '{$pet['favcolor']}', '{$pet['petname']}')";
@@ -86,3 +117,31 @@ class PetAdoptionTablePlugin
 }
 
 $petAdoptionTablePlugin = new PetAdoptionTablePlugin();
+
+
+class OurPluginPlaceholderBlock
+{
+  function __construct($name)
+  {
+    $this->name = $name;
+    add_action('init', [$this, 'onInit']);
+  }
+
+  function ourRenderCallback($attributes, $content)
+  {
+    ob_start();
+    require plugin_dir_path(__FILE__) . 'our-blocks/' . $this->name . '.php';
+    return ob_get_clean();
+  }
+
+  function onInit()
+  {
+    wp_register_script($this->name, plugin_dir_url(__FILE__) . "/our-blocks/{$this->name}.js", array('wp-blocks', 'wp-editor'));
+
+    register_block_type("ourdatabaseplugin/{$this->name}", array(
+      'editor_script' => $this->name,
+      'render_callback' => [$this, 'ourRenderCallback']
+    ));
+  }
+}
+new OurPluginPlaceholderBlock("petlist");

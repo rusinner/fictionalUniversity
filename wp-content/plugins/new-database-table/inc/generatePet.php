@@ -13,7 +13,7 @@ function generatePet()
   $combined_name = $adjectives[array_rand($adjectives, 1)] . " " . $names[array_rand($names, 1)] . " " . $suffix[array_rand($suffix, 1)];
 
   return array(
-    'birthyear' => rand(2006, 2021),
+    'birtyear' => rand(2006, 2021),
     'petweight' => rand(1, 100),
     'petname' => trim($combined_name),
     'species' => $species[array_rand($species, 1)],
