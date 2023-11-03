@@ -1,5 +1,8 @@
 <?php
 
+require_once plugin_dir_path(__FILE__) . 'GetPets.php';
+$getPets = new GetPets();
+
 get_header(); ?>
 
 <div class="page-banner">
@@ -9,12 +12,12 @@ get_header(); ?>
     <div class="page-banner__intro">
       <p>Providing forever homes one search at a time.</p>
     </div>
-  </div>  
+  </div>
 </div>
 
 <div class="container container--narrow page-section">
 
-  <p>This page took <strong><?php echo timer_stop();?></strong> seconds to prepare. Found <strong>x</strong> results (showing the first x).</p>
+  <p>This page took <strong><?php echo timer_stop(); ?></strong> seconds to prepare. Found <strong><?php echo $getPets->count; ?></strong> results (showing the first <?php echo count($getPets->pets); ?>).</p>
 
   <table class="pet-adoption-table">
     <tr>
@@ -26,17 +29,21 @@ get_header(); ?>
       <th>Favorite Color</th>
       <th>Favorite Food</th>
     </tr>
-    <tr>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
+    <?php
+    foreach ($getPets->pets as $pet) { ?>
+      <tr>
+        <td><?php echo $pet->petname ?></td>
+        <td><?php echo $pet->species ?></td>
+        <td><?php echo $pet->petweight ?></td>
+        <td><?php echo $pet->birtyear ?></td>
+        <td><?php echo $pet->favhobby ?></td>
+        <td><?php echo $pet->favcolor ?></td>
+        <td><?php echo $pet->favfood ?></td>
+      </tr>
+    <?php  }
+    ?>
   </table>
-  
+
 </div>
 
 <?php get_footer(); ?>
